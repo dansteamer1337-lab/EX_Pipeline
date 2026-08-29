@@ -1,0 +1,6 @@
+<Solution>
+  <Folder Name="/DotNetApp/">
+    <Project Path="DotNetApp/App.Tests/App.Tests.csproj" />
+    <Project Path="DotNetApp/App/App.csproj" />
+  </Folder>
+</Solution>
