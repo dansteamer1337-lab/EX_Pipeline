@@ -103,6 +103,10 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Set lower case image name
+        run: |
+          echo "DOCKER_IMAGE=${REGISTRY}/${GITHUB_REPOSITORY,,}/app:${GITHUB_SHA}" >> $GITHUB_ENV
+
       - name: Prepare Remote Deployment Directory
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -124,20 +128,17 @@ jobs:
       - name: Deploy Services via Docker Compose
         uses: appleboy/ssh-action@v1.0.3
         env:
-          IMAGE_TAG: ${{ github.sha }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
+          DOCKER_IMAGE: ${{ env.DOCKER_IMAGE }}
           ENV_CONTENT: ${{ secrets.ENV_FILE_CONTENT }}
         with:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER || 'ubuntu' }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          envs: IMAGE_TAG,GITHUB_REPOSITORY,ENV_CONTENT
+          envs: DOCKER_IMAGE,ENV_CONTENT
           script: |
             cd /home/${{ secrets.SERVER_USER || 'ubuntu' }}/app
-            LOWER_REPO=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')
             echo "$ENV_CONTENT" > .env
-            echo "IMAGE_TAG=$IMAGE_TAG" >> .env
-            echo "GITHUB_REPOSITORY=${LOWER_REPO}" >> .env
+            echo "DOCKER_IMAGE=$DOCKER_IMAGE" >> .env
             echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             docker compose pull
             docker compose up -d --remove-orphans
