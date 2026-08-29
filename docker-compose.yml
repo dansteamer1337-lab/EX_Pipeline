@@ -1,9 +1,9 @@
 services:
   app:
-    image: ${DOCKER_IMAGE:-ghcr.io/${GITHUB_REPOSITORY:-user/repo}/app:${IMAGE_TAG:-latest}}
+    image: ghcr.io/${GITHUB_REPOSITORY}/app:${IMAGE_TAG:-latest}
     build:
       context: .
-      file: ./DotNetApp/App/Dockerfile
+      dockerfile: ./DotNetApp/App/Dockerfile
     container_name: api_app
     restart: unless-stopped
     env_file: .env
