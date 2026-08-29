@@ -86,7 +86,7 @@ app.MapDelete("/products/{id:int}", async (int id, AppDbContext db) =>
     await db.SaveChangesAsync();
     return Results.NoContent();
 });
-
+// asdasda
 app.Run();
 
 public class User
